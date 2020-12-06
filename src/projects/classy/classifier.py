@@ -12,35 +12,55 @@ def classify(people: dict) -> List[str]:
     
     Return the ordered (highest to lowest) list
     """
-    # ["Beaver", "Elephant", "Aardvark", "Cheetah", "Dolphin"],
-    # Why Dolphine is After Cheetah. Not sure. 
-    # My Brute Force Solution might be iterate through the dictionary
-    # And at the same time, I will also iterate through myList 3 times. It will be 
-    # Time Complexity O(n^2)
-    # people = {"Ant": "upper", "Bee": "middle", "Cat": "lower"}
-    myList = {}
-    finalList = []
+    # class_rank = {"upper":5,"middle":4,"lower":3}
+    # class_rank = {"upper":5,"middle":4,"lower":3}
+    myDict = {}
     for aKey, aValue in people.items():
-        if len(myList) > 0:
-            for x, y in myList.items():
-                if y == "upper":
-                    myList[x] y
-                elif y =="middle":
-                    if y == "upper":
-                        myList.insert(i-1,  aValue)
-                        i += 1
-                    else:
-                        myList.append(aValue)
-                        i += 1
-                else:
-                    myList.insert(i-1, aValue)
-                    i += 1
+        myString = ''
+        valueList = aValue.split("-")
+        valueList = valueList[::-1]
+        for i in valueList:
+            if i == "upper":
+                myString+= "5"
+            if i == "middle":
+                myString += "4"
+            if i == "lower":
+                myString += "3"
+        myDict[aKey] = myString
+    res = list(myDict.values())[0]
+    for aKey, aValue in myDict.items():
+        if len(aValue) > len(res):
+            res = aValue
+    almostFinal = {}
+    for aKey, aValue in myDict.items():
+        if len(aValue) != len(res):
+            a = len(res) - len(aValue)
+            b = a * '4'
+            c = str(aValue) + str(b)
+            almostFinal[aKey] = c
         else:
-            myList[aKey] = aValue
-    print(myList)
-    
-
-
+            almostFinal[aKey] = aValue
+    rest = list(myDict.values())[0]
+    flipped = {}
+    for key, value in almostFinal.items():
+        if value not in flipped:
+            flipped[value] = [key]
+        else:
+            flipped[value].append(key)
+   
+    for key, value in flipped.items():
+        value.sort()
+        flipped[key] = value
+       
+    dictionary_items = flipped.items()
+    sorted_items = sorted(dictionary_items)
+    final = []
+    for key, value in sorted_items:
+        final.append(value)
+    final = final[::-1]
+    flattened = [val for sublist in final for val in sublist]
+    print(flattened)
+    return flattened
 def read_file(filename: str) -> Dict[str, str]:
     """
     Read data from the file into a dictionary
