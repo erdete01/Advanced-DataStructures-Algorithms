@@ -12,19 +12,19 @@ def classify(people: dict) -> List[str]:
     
     Return the ordered (highest to lowest) list
     """
-    # class_rank = {"upper":5,"middle":4,"lower":3}
-    # class_rank = {"upper":5,"middle":4,"lower":3}
+     # class_rank = {"upper":5,"middle":4,"lower":3}
     myDict = {}
     for aKey, aValue in people.items():
         myString = ''
         valueList = aValue.split("-")
         valueList = valueList[::-1]
+        print(valueList)
         for i in valueList:
-            if i == "upper":
+            if i == "upper" or i == " upper" or i == "upper ":
                 myString+= "5"
-            if i == "middle":
+            if i == "middle" or i == " middle" or i == "middle ":
                 myString += "4"
-            if i == "lower":
+            if i == "lower" or i == "lower " or i == " lower":
                 myString += "3"
         myDict[aKey] = myString
     res = list(myDict.values())[0]
@@ -32,6 +32,7 @@ def classify(people: dict) -> List[str]:
         if len(aValue) > len(res):
             res = aValue
     almostFinal = {}
+    # print(myDict)
     for aKey, aValue in myDict.items():
         if len(aValue) != len(res):
             a = len(res) - len(aValue)
@@ -40,7 +41,7 @@ def classify(people: dict) -> List[str]:
             almostFinal[aKey] = c
         else:
             almostFinal[aKey] = aValue
-    rest = list(myDict.values())[0]
+    # print(almostFinal)
     flipped = {}
     for key, value in almostFinal.items():
         if value not in flipped:
@@ -59,7 +60,6 @@ def classify(people: dict) -> List[str]:
         final.append(value)
     final = final[::-1]
     flattened = [val for sublist in final for val in sublist]
-    print(flattened)
     return flattened
 def read_file(filename: str) -> Dict[str, str]:
     """
