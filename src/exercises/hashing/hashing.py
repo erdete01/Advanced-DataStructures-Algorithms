@@ -4,23 +4,19 @@
 
 def hash_remainder(key: int, size: int) -> int:
     """Find hash using remainder"""
-    a = key%size
-    return a
+    return key%size
 
 
 def hash_mid_sqr(key: int, size: int) -> int:
     """Find hash using mid-square method"""
-    squared = key * key
-    str_squared = str(squared)
-    mid = len(str_squared) // 2
-    return int(str_squared[mid-1:mid+1]) % size
+    mid = len(str(key * key)) // 2
+    return int(str(key * key)[mid-1:mid+1]) % size
 
 
 def hash_folding(key: int, size: int) -> int:
     """Find hash using folding method"""
-    stringSplit = key.split('-')
     myNumbers = ''
-    for i in stringSplit:
+    for i in key.split('-'):
         myNumbers += i
     myList = []
     for i in range(1, len(myNumbers), 2):
