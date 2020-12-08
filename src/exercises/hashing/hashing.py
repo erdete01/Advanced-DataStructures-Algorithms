@@ -9,8 +9,8 @@ def hash_remainder(key: int, size: int) -> int:
 
 def hash_mid_sqr(key: int, size: int) -> int:
     """Find hash using mid-square method"""
-    mid = len(str(key * key)) // 2
-    return int(str(key * key)[mid-1:mid+1]) % size
+    return int(str(key * key) \
+        [len(str(key * key)) // 2-1:len(str(key * key)) // 2+1]) % size
 
 
 def hash_folding(key: int, size: int) -> int:
@@ -18,12 +18,10 @@ def hash_folding(key: int, size: int) -> int:
     myNumbers = ''
     for i in key.split('-'):
         myNumbers += i
-    myList = []
-    for i in range(1, len(myNumbers), 2):
-        total = str(myNumbers[i-1]) + str(myNumbers[i])
-        myList.append(total)
+    converting = [str(myNumbers[i-1]) + str(myNumbers[i]) \
+         for i in range(1, len(myNumbers), 2)]
     totalNum = 0
-    for i in myList:
+    for i in converting:
         totalNum += int(i)
     return (totalNum % size)
 
