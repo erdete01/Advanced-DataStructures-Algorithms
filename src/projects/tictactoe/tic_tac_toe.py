@@ -57,7 +57,13 @@ class Board:
         represent exactly the same state.
         """
         # TODO: COMPLETE THIS FUNCTION
-        pass
+        for i in self:
+            for j in other:
+                for test1 in i:
+                    for test2 in j:
+                        if type(test1) != type(test2):
+                            return False
+        return True
 
     def __hash__(self):
         result = 0
@@ -88,8 +94,47 @@ class Board:
         state of the board. If the computer has won, return 1.
         If the human has won, return -1. Otherwise, return 0.
         """
+        # The board has 8 ways to win the game
         # TODO: COMPLETE THIS FUNCTION
-        pass
+        if isinstance(self.items[0][0], X) and isinstance(self.items[0][1], X) and isinstance(self.items[0][2], X):
+            return 1
+        if isinstance(self.items[0][0], X) and isinstance(self.items[1][0], X) and isinstance(self.items[2][0], X):
+            return 1
+        if isinstance(self.items[0][0], X) and isinstance(self.items[1][1], X) and isinstance(self.items[2][2], X):
+            return 1
+        if isinstance(self.items[1][0], X) and isinstance(self.items[1][1], X) and isinstance(self.items[1][2], X):
+            return 1
+        if isinstance(self.items[2][0], X) and isinstance(self.items[2][1], X) and isinstance(self.items[2][2], X):
+            return 1
+        if isinstance(self.items[2][0], X) and isinstance(self.items[1][1], X) and isinstance(self.items[0][2], X):
+            return 1
+        if isinstance(self.items[2][1], X) and isinstance(self.items[1][1], X) and isinstance(self.items[0][2], X):
+            return 1
+        if isinstance(self.items[2][1], X) and isinstance(self.items[1][1], X) and isinstance(self.items[0][1], X):
+            return 1
+        if isinstance(self.items[2][2], X) and isinstance(self.items[1][2], X) and isinstance(self.items[0][2], X):
+            return 1
+        if isinstance(self.items[0][0], O) and isinstance(self.items[0][1], O) and isinstance(self.items[0][2], O):
+            return -1
+        if isinstance(self.items[0][0], O) and isinstance(self.items[1][0], O) and isinstance(self.items[2][0], O):
+            return -1
+        if isinstance(self.items[0][0], O) and isinstance(self.items[1][1], O) and isinstance(self.items[2][2], O):
+            return -1
+        if isinstance(self.items[1][0], O) and isinstance(self.items[1][1], O) and isinstance(self.items[1][2], O):
+            return -1
+        if isinstance(self.items[2][0], O) and isinstance(self.items[2][1], O) and isinstance(self.items[2][2], O):
+            return -1
+        if isinstance(self.items[0][0], O) and isinstance(self.items[1][1], O) and isinstance(self.items[0][2], O):
+            return -1
+        if isinstance(self.items[2][1], O) and isinstance(self.items[1][1], O) and isinstance(self.items[0][2], O):
+            return -1
+        if isinstance(self.items[2][1], O) and isinstance(self.items[1][1], O) and isinstance(self.items[0][1], O):
+            return -1
+        if isinstance(self.items[2][2], O) and isinstance(self.items[1][2], O) and isinstance(self.items[0][2], O):
+            return -1
+        else:
+            return 0
+
 
     def full(self):
         """
@@ -97,8 +142,12 @@ class Board:
         is completely filled up (no dummy turtles).
         Otherwise, it should return False.
         """
-        # TODO: COMPLETE THIS FUNCTION
-        pass
+        for i in range(3):
+            for x in range(3):
+                if isinstance(self.items[i][x], X) or isinstance(self.items[i][x], O):
+                    return True
+                elif isinstance(self.items[i][x], Dummy):
+                    return False
 
     def drawXOs(self):
         """
@@ -118,7 +167,10 @@ class Board:
         """
         Return available (empty) cells
         """
-        pass
+        if self.full():
+            return []
+        allAvailable = [(i, j) for i in range(3) for j in range(3)]
+        return allAvailable
 
     def clone(self):
         """
@@ -211,9 +263,30 @@ def minimax(player, board, depth=4):
     The base case results when, given the state of the board, someone has won or
     the board is full.
     """
-    # TODO: COMPLETE THIS FUNCTION
-    pass
-
+    #Both players start with your worst score. 
+    #If player is MAX, its score is -infinity. 
+    #Else if player is MIN, its score is +infinity.
+    if board.eval() or depth == 0:
+        return board.eval()
+    # If board.full() getting error. cuz my minimax is not implemented correctly.
+    if board.full:
+        return 0
+    if player == 1:
+        move = -1
+        board_copy = board.clone()
+        for i, j in board.available():
+            board_copy[i][j] = X(board.screen)
+            # print(board_copy[i][j])
+            # switch turn and return the bestMove
+            move = max(move, minimax(-1, board_copy, depth-1))
+        return move
+    if player == -1:
+        move = 1
+        board_copy = board.clone()
+        for i, j in board.available():
+            board_copy[i][j] = O(board.screen)
+            move = min(move, minimax(1, board_copy, depth-1))
+        return move   
 
 class TicTacToe(tkinter.Frame):
     def __init__(self, master=None):
@@ -313,7 +386,19 @@ class TicTacToe(tkinter.Frame):
             # if the best move is in the first row and third column
             # then maxMove would be (0,2).
             # TODO: IMPLEMENT THE DESCRIBED LOGIC
+            for i in AILVLS:
+                depth = i
+            greaterMove = - 1
+            # iterate through a dictionary
+            board_copy = board.clone()
+            for i, j in board.available():
+                board_copy[i][j] = X(board.screen)
+                maxMove = minimax(-1, board_copy, depth)
+                if maxMove>greaterMove: 
+                    row, col = i, j
+                    maxMove = greaterMove
 
+            maxMove = (row, col)
             row, col = maxMove
             board[row][col] = X(canvas)
             self.locked = False
