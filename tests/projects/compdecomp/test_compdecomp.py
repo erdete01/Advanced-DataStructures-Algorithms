@@ -88,5 +88,71 @@ def test_follow_tree_to_none(text, code2char):
     if "1" not in codes:
         assert follow_tree(root, "1") is None
 
+
+@pytest.mark.timeout(TIME_LIMIT)
+@pytest.mark.parametrize(
+    "text, char2code, code2char",
+    get_cases("test_case", ("text", "char2code", "code2char")),
+)
+
+def test_mark_tree(text, char2code, code2char):
+    #Testing the tree marking
+    weights = Counter(text)
+    root = build_tree(weights)
+    d1 = {}
+    d2 = {}
+    mark_tree(d1, d2, root, "")
+    assert d1 == json.loads(char2code)
+    assert d2 == json.loads(code2char)
+
+
+@pytest.mark.timeout(TIME_LIMIT)
+@pytest.mark.parametrize(
+    "filename, tree",
+    get_cases("test_case", ("filename", "tree")),
+)
+def test_load_codes(filename, tree):
+    #Testing the codes loading
+    with open(DATA_DIR / pathlib.Path(f"{filename}.json"), "r") as code_file:
+        metadata = json.load(code_file)
+    root = load_codes(metadata)
+    assert traverse_tree(root) == tree
+
+
+@pytest.mark.timeout(TIME_LIMIT)
+@pytest.mark.parametrize(
+    "filename, padding",
+    get_cases("test_case", ("filename", "padding")),
+)
+def test_compression(filename, padding):
+    #Testing the compression
+    with open(DATA_DIR / pathlib.Path(f"{filename}.txt"), "r") as text_file:
+        text = text_file.read().strip()
+    weights = Counter(text)
+    root = build_tree(weights)
+    char_to_code, _ = mark_tree({}, {}, root, "")
+    with open(
+        pathlib.Path(f"data/projects/compdecomp/{filename}.bin"), "rb"
+    ) as compressed:
+        assert compress(text, char_to_code) == (compressed.read(), padding)
+
+
+@pytest.mark.timeout(TIME_LIMIT)
+@pytest.mark.parametrize(
+    "filename, text",
+    get_cases("test_case", ("filename", "text")),
+)
+def test_decompression(filename, text):
+    #Testing the decompression
+    with open(DATA_DIR / pathlib.Path(f"{filename}.json"), "r") as code_file:
+        metadata = json.load(code_file)
+    root = load_codes(metadata)
+    padding_length = metadata.get("padding", 0)
+    with open(
+        pathlib.Path(f"data/projects/compdecomp/{filename}.bin"), "rb"
+    ) as compressed:
+        assert decompress(compressed.read(), padding_length, root) == text
+
+
 if __name__ == "__main__":
     pytest.main(["-v", "test_compdecomp.py"])
