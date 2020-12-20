@@ -9,7 +9,7 @@ class TreeNode:
         self.right = right
 
 def get_preorder(inorder, postorder):
-    """Return pre-order traversal of a tree based on its in-order and post-order traversals"""
+    # Return pre-order traversal of a tree based on its in-order and post-order traversals
     inorder = list(inorder)
     postorder = list(postorder)
     def rec(inorder, postorder):
@@ -17,7 +17,6 @@ def get_preorder(inorder, postorder):
             return
         # This will be always the node
         root = TreeNode(postorder.pop())
-
         mid = inorder.index(root.val)
         root.right = rec(inorder[mid+1:], postorder)
         root.left = rec(inorder[:mid], postorder)
