@@ -44,7 +44,21 @@ def build_tree(all_freq: dict) -> Node:
     """
     heap: List[Node] = []
     # TODO: Implement this function
-    raise NotImplementedError
+    for keys, values in all_freq.items():
+        myNode = Node(keys, values)
+        heapq.heappush(heap, myNode)
+    heapq.heapify(heap)
+
+    while len(heap) > 1:
+        node1 = heapq.heappop(heap)
+        node2 = heapq.heappop(heap)
+        newWeight = (node1.weight + node2.weight)
+        res = Node(heap, newWeight)
+        res.left = node1
+        res.right = node2
+        heapq.heappush(heap, Node(res, newWeight))
+    return(res)
+    
 
 
 def traverse_tree(root: Node) -> str:
@@ -54,9 +68,16 @@ def traverse_tree(root: Node) -> str:
     :param root: tree root
     :return values of a tree
     """
-    # TODO: Implement this function
-    raise NotImplementedError
-
+    res = ''
+    if (root.left == None and root.right == None):
+        res += str(root.value)
+        # print(root.value)
+        return
+    if root.left:
+        traverse_tree(root.left)
+    if root.right:
+        traverse_tree(root.right)
+    # return res
 
 def follow_tree(tree: Node, code: str) -> Union[str, None]:
     """
@@ -67,7 +88,11 @@ def follow_tree(tree: Node, code: str) -> Union[str, None]:
     :return node value or None
     """
     # TODO: Implement this function
-    raise NotImplementedError
+    if tree.value == None:
+        return 
+    # if tree.value != None:
+    #     current_code= code[tree.value]
+    #     print(current_code)
 
 
 def mark_tree(d1: dict, d2: dict, root: Node, path: str) -> Union[None, tuple]:
@@ -81,7 +106,10 @@ def mark_tree(d1: dict, d2: dict, root: Node, path: str) -> Union[None, tuple]:
     :return (d1, d2) tuple
     """
     # TODO: Implement this function
-    raise NotImplementedError
+    # print(d1, "I am d1") 
+    # print(d2, "I am d2")
+    # print(root, "i am root")
+    # print(path, "i am path")
 
 
 def print_codes(d: dict, weights: dict) -> None:
@@ -104,7 +132,11 @@ def load_codes(codes: dict) -> Node:
     :return root of the Huffman tree
     """
     # TODO: Implement this function
-    raise NotImplementedError
+    res = ''
+    # print(codes)
+    for values in codes.values():
+        res = res + str(values) + " "
+    return res
 
 
 def compress(text: str, codes: dict) -> Tuple[bytes, int]:
@@ -116,7 +148,7 @@ def compress(text: str, codes: dict) -> Tuple[bytes, int]:
     :return (packed text, padding length) tuple
     """
     # TODO: Implement this function
-    raise NotImplementedError
+    pass
 
 
 def decompress(bytestream: bytes, padding: int, tree: Node) -> str:
