@@ -7,7 +7,7 @@ import heapq
 import json
 import logging
 import pathlib
-from collections import Counter
+from collections import Counter, OrderedDict
 from typing import List, Tuple, Union
 
 DATA_DIR = pathlib.Path("data/projects/compdecomp/")
@@ -47,18 +47,16 @@ def build_tree(all_freq: dict) -> Node:
     for keys, values in all_freq.items():
         myNode = Node(keys, values)
         heapq.heappush(heap, myNode)
-    heapq.heapify(heap)
 
     while len(heap) > 1:
         node1 = heapq.heappop(heap)
         node2 = heapq.heappop(heap)
-        newWeight = (node1.weight + node2.weight)
-        res = Node(heap, newWeight)
-        res.left = node1
-        res.right = node2
-        heapq.heappush(heap, Node(res, newWeight))
-    return(res)
-    
+        merged = Node(heap, node1.weight + node2.weight)
+        merged.left = node1
+        merged.right = node2
+        heapq.heappush(heap, merged)
+    return(merged)    
+
 
 
 def traverse_tree(root: Node) -> str:
@@ -68,16 +66,24 @@ def traverse_tree(root: Node) -> str:
     :param root: tree root
     :return values of a tree
     """
+    left = []  
+    right = []  
+    left.append(root)  
+    while len(left) > 0:  
+        node = left.pop()  
+        # If Leaf, add the values
+        if node.left is None and node.right is None:  
+            right.append(node)  
+        else:
+            if node.left is not None: 
+                left.append(node.left)  
+            if node.right is not None:  
+                left.append(node.right)  
+    # Right has all the root values
     res = ''
-    if (root.left == None and root.right == None):
-        res += str(root.value)
-        # print(root.value)
-        return
-    if root.left:
-        traverse_tree(root.left)
-    if root.right:
-        traverse_tree(root.right)
-    # return res
+    for i in range(0, len(right)):
+        res += right.pop().value
+    return ' '.join(res) 
 
 def follow_tree(tree: Node, code: str) -> Union[str, None]:
     """
@@ -87,12 +93,16 @@ def follow_tree(tree: Node, code: str) -> Union[str, None]:
     :param code: code to find
     :return node value or None
     """
-    # TODO: Implement this function
-    if tree.value == None:
-        return 
-    # if tree.value != None:
-    #     current_code= code[tree.value]
-    #     print(current_code)
+    # Give left 0 and right 1
+    ans = None
+    for i in code:
+        if i == '0':
+            tree = tree.left
+        if i == '1':
+            tree = tree.right
+        if tree.left == None and tree.right == None:
+            ans = tree.value
+    return ans
 
 
 def mark_tree(d1: dict, d2: dict, root: Node, path: str) -> Union[None, tuple]:
@@ -105,12 +115,20 @@ def mark_tree(d1: dict, d2: dict, root: Node, path: str) -> Union[None, tuple]:
     :param path: path to the current node
     :return (d1, d2) tuple
     """
-    # TODO: Implement this function
-    # print(d1, "I am d1") 
-    # print(d2, "I am d2")
-    # print(root, "i am root")
-    # print(path, "i am path")
+    if root.left is None and root.right is None:
+        d1[root.value] = path
+        d2[path] = root.value
+        return
 
+    if root.left is not None:
+        if root.left not in d1.keys():
+            mark_tree(d1, d2, root.left, path + '0')
+
+    if root.right is not None:
+        if root.right not in d1.keys():
+            mark_tree(d1, d2, root.right, path + '1')
+
+    return (d1, d2)
 
 def print_codes(d: dict, weights: dict) -> None:
     """
@@ -131,13 +149,42 @@ def load_codes(codes: dict) -> Node:
     :param codes: code-to-character mapping
     :return root of the Huffman tree
     """
-    # TODO: Implement this function
-    res = ''
-    # print(codes)
-    for values in codes.values():
-        res = res + str(values) + " "
-    return res
-
+    # Building Node
+    root = Node(None, None)
+    cur = root
+    for i in codes:
+        val = codes[i]
+        for j in range(len(i)):
+            if j == len(i) - 1:    
+                if i[j] == '0' and cur.left == None:
+                    node = Node(None, None)
+                    node.value = val
+                    cur.left = node
+                if i[j] == '1' and cur.right == None:
+                    node = Node(None, None)
+                    node.value = val
+                    cur.right = node
+                if i[j] == '0' and cur.left != None:
+                    node = cur.left
+                    node.value = val
+                if i[j] == '1' and cur.right != None:
+                    node = cur.right
+                    node.value = val
+            else:
+                if i[j] == '0' and cur.left == None:
+                    node = Node(None, None)
+                    cur.left = node
+                    cur = cur.left
+                if i[j] == '1' and cur.right == None:
+                    node = Node(None, None)
+                    cur.right = node
+                    cur = cur.right
+                if i[j] == '0' and cur.left != None:
+                    cur = cur.left
+                if i[j] == '1' and cur.right != None:
+                    cur = cur.right
+        cur = root
+    return root
 
 def compress(text: str, codes: dict) -> Tuple[bytes, int]:
     """
@@ -148,7 +195,20 @@ def compress(text: str, codes: dict) -> Tuple[bytes, int]:
     :return (packed text, padding length) tuple
     """
     # TODO: Implement this function
-    pass
+    myList = list()
+    padding = str()
+    myList = [codes[letter]for letter in text]
+    myList = "".join(myList)
+    while len(myList) % 8 > 0:
+        padding += "0"
+        myList += "0"
+    myBytes = bytearray()
+    i = 0
+    while i < len(myList):
+        byte = myList[i:i+8]
+        myBytes.append(int(byte, 2))
+        i += 8
+    return (bytes(myBytes), len(padding))
 
 
 def decompress(bytestream: bytes, padding: int, tree: Node) -> str:
@@ -161,7 +221,12 @@ def decompress(bytestream: bytes, padding: int, tree: Node) -> str:
     :return decompressed (decoded) text
     """
     # TODO: Implement this function
-    raise NotImplementedError
+    binaryNumbers = bin(int.from_bytes(bytestream, byteorder = "big"))[2:]
+    binaryNumbers = "0" + str(binaryNumbers)
+    removePadding = binaryNumbers[:-padding]
+    print(binaryNumbers)
+    ## Not sure how to decompress
+
 
 
 def main():
