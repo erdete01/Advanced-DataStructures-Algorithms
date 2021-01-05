@@ -10,7 +10,7 @@ from .binary_search_tree import BinaryTreeNode
 class AVLTreeNode(BinaryTreeNode):
     """AVL Tree Node"""
 
-    def __init__(self, key, val, balance, left=None, right=None, parent=None):
+    def __init__(self, key, val, balance , left=None, right=None, parent=None):
         """Create an AVL tree node"""
         BinaryTreeNode.__init__(self, key, val, left, right, parent)
         self._balance = balance
@@ -36,54 +36,81 @@ class AVLTree(BinarySearchTree):
     def put(self, key, value):
         """Add new node"""
         if self._root:
+            print("now adding _put", key, value)
             self._put(key, value, self._root)
         else:
+            print("adding root first time", key, value)
             self._root = AVLTreeNode(key, value, 0)
         self._size = self._size + 1
 
     def _put(self, key, value, current_node: AVLTreeNode) -> None:
         """Add a new node to the tree (helper function)"""
         if key < current_node.key:
+            print("case1")
+            print(key, value, "key", current_node.key, "current_node")
             if current_node.get_child_left():
+                print("already has left child" )
                 self._put(key, value, current_node.child_left)
             else:
                 current_node.child_left = AVLTreeNode(
                     key, value, 0, parent=current_node
                 )
+                print("just add first time", current_node.key, current_node.child_left.key, "current_node.child_left.key")
                 self.update_balance(current_node.child_left)
         else:
+            print("case2")
+            print(key, value, "key", current_node.key, "current_node")
             if current_node.get_child_right():
+                print("it had right child so put", key, value, current_node.child_right.key, "current_node_child_right")
                 self._put(key, value, current_node.child_right)
             else:
+                print("it did not had right child")
                 current_node.child_right = AVLTreeNode(
                     key, value, 0, parent=current_node
                 )
+                print("added to the right", current_node.key,current_node.child_right.key )
                 self.update_balance(current_node.child_right)
 
     def update_balance(self, node: AVLTreeNode) -> None:
         """Update the tree balance"""
         # TODO: Fix this method
+        print(node.balance, "calling update")
+        print(node.key)
         if node.balance > 1 or node.balance < -1:
+            print("calling node", node.key)
             self.rebalance(node)
             return
         if node.parent:
             if node.is_child_left():
+                print("its adding")
+                print(node.parent.balance, node.parent.key, "balance should be")
                 node.parent.balance += 1
             elif node.is_child_right():
+                print("it's subtracting")
+                print(node.parent.balance, node.parent.key, "idk")
                 node.parent.balance -= 1
-
             if node.parent.balance != 0:
+                print(node.balance, "calling update twice")
                 self.update_balance(node.parent)
-
+    
     def rebalance(self, node: AVLTreeNode) -> None:
         """Rebalance the tree"""
         # TODO: consider all cases
+        print(node.key, node.balance)
         if node.balance < 0:
-            if node.child_left.balance < 0:
-                raise NotImplementedError
-        elif node.balance > 0:
+            print(node.child_right.key, "right child", node.child_right.balance, "node.child_right.balance. ")
             if node.child_right.balance > 0:
-                raise NotImplementedError
+                self.rotate_right(node.child_right)
+                self.rotate_left(node)
+            else:
+                self.rotate_left(node)
+        # elif node.balance > 0:
+        #     if node.left_right.balance < 0:
+        #         self.rotate_left(node.child_left)
+        #         self.rotate_right(node)
+        #     else:
+        #         self.rotate_right(node)
+
 
     def rotate_left(self, rotation_root: AVLTreeNode) -> None:
         """Left rotation"""
@@ -101,8 +128,8 @@ class AVLTree(BinarySearchTree):
                 rotation_root.parent.child_right = new_root
         new_root.child_left = rotation_root
         rotation_root.parent = new_root
-        # TODO: update rotation_root.balance
-        # TODO: update new_root.balance
+        rotation_root.balance = rotation_root.balance + 1 - min(new_root.balance, 0)
+        new_root.balance = new_root.balance + 1 + max(rotation_root.balance, 0)
 
     def rotate_right(self, rotation_root: AVLTreeNode) -> None:
         """Right rotation"""
@@ -120,5 +147,7 @@ class AVLTree(BinarySearchTree):
                 rotation_root.parent.child_left = new_root
         new_root.child_right = rotation_root
         rotation_root.parent = new_root
-        # TODO: update rotation_root.balance
-        # TODO: update new_root.balance
+
+        rotation_root.balance = rotation_root.balance - 1 + min(new_root.balance, 0)
+        new_root.balance = new_root.balance - 1 - max(rotation_root.balance, 0)
+        
