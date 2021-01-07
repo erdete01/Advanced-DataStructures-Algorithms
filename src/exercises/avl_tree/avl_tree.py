@@ -148,5 +148,5 @@ class AVLTree(BinarySearchTree):
         new_root.child_right = rotation_root
         rotation_root.parent = new_root
 
-        rotation_root.balance = rotation_root.balance - 1 - max(0, new_root.balance)
-        new_root.balance = new_root.balance - 1 + min(0, rotation_root.balance)
+        # rotation_root.balance = rotation_root.balance - 1 - max(0, new_root.balance)
+        new_root.balance = rotation_root.balance + 1 - min(0, rotation_root.balance)
