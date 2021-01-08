@@ -63,7 +63,6 @@ class AVLTree(BinarySearchTree):
 
     def update_balance(self, node: AVLTreeNode) -> None:
         """Update the tree balance"""
-        # TODO: Fix this method
         print(node.balance, "calling update")
         print(node.key)
         if node.balance > 1 or node.balance < -1:
