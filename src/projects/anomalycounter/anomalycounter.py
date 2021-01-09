@@ -32,4 +32,4 @@ def helper(floodMatrix,i, j):
     helper(floodMatrix, i, j+1) # Right
     helper(floodMatrix, i, j-1) # Left
     helper(floodMatrix, i+1, j) # Up
-    helper(floodMatrix, i-1, j) # Down
+    helper(floodMatrix, i-1, j) # Down 
