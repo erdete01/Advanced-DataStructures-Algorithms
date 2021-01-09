@@ -12,34 +12,24 @@ Anomaly counter
 def rowAndColumn(path: str) -> list:
     myList = list()
     f = open(path, "r")
-    for x in f: myList.append([x.replace("\n","")])
+    for x in f: myList.append(list(x.replace("\n","")))
     return (myList)
 
-def count(filename: str) -> int:
-    """Count number of anomalies/blobs in an image"""
-    myList = rowAndColumn(filename)
-    # Created row and a column
-    row, col = len(myList), len(myList[0][0])
-
-def floodFill(myString):
-    myStack = []
-    counter = 0
-    row, col = len(myString), len(myString[0][0])
-    for i in range(col):
-        for j in range(row):
-            if myString[i][j] == "*": 
-                myStack.append([i, j])
-            else: 
-                count
-    return counter
-
-    # for i in myList:
-    #     # Only Checking the first myList[0], not dynamic.
-    #     if i == len(i)*"*":
-    #         return 1
-    #     for k in i:
-    #         if "*" not in k: return 0
-    #         else:
-    #             pass
-    #             # Check East, West, South, and North 
-    #             # Maybe convert it into a while loop
+def count(filename):
+  counter = 0
+  floodMatrix = rowAndColumn(filename)
+  for i in range(len(floodMatrix)):
+    for j in range(len(floodMatrix[0])):
+      if floodMatrix[i][j] == "*":
+        counter += 1
+        helper(floodMatrix,i, j)
+  return counter
+                   
+def helper(floodMatrix,i, j):
+  # Base case
+  if 0<=i<len(floodMatrix) and 0<=j<len(floodMatrix[0]) and floodMatrix[i][j] == "*":
+    floodMatrix[i][j] = 7
+    helper(floodMatrix, i, j+1)
+    helper(floodMatrix, i, j-1)
+    helper(floodMatrix, i+1, j)
+    helper(floodMatrix, i-1, j)
