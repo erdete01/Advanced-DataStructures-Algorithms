@@ -29,7 +29,7 @@ def helper(floodMatrix,i, j):
   # Base case
   if 0<=i<len(floodMatrix) and 0<=j<len(floodMatrix[0]) and floodMatrix[i][j] == "*":
     floodMatrix[i][j] = 7
-    helper(floodMatrix, i, j+1)
-    helper(floodMatrix, i, j-1)
-    helper(floodMatrix, i+1, j)
-    helper(floodMatrix, i-1, j)
+    helper(floodMatrix, i, j+1) # Right
+    helper(floodMatrix, i, j-1) # Left
+    helper(floodMatrix, i+1, j) # Up
+    helper(floodMatrix, i-1, j) # Down
