@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Exam strategy
-"""
-
 from collections import namedtuple
 from typing import List, Tuple
 
@@ -17,8 +12,39 @@ def knapsack(capacity: int, items: List[Item]) -> List[int]:
     The function returns a list of chosen indices.
     This function is optional but highly recommended.
     Use of the named tuple Item is optional but encouraged.
-    """
-    pass
+    """ 
+    # Get all the weights and values
+    value, weight, myMatrix = [], [], []
+    for i in items: value.append(i[0])
+    for i in items: weight.append(i[1])
+    row = weight[0]
+    # First law. Create all 0
+    myMatrix = [[0 for i in range(capacity+1)] for i in range(row+1)]
+    # Add second and third law
+    value.pop(0)
+    weight.pop(0)
+    for i in range(row + 1): 
+        for j in range(capacity + 1): 
+            if i == 0 or j == 0:  myMatrix[i][j] = 0
+            # Third law
+            elif weight[i-1] <= j: myMatrix[i][j] = max(value[i-1] + myMatrix[i-1][j-weight[i-1]],  myMatrix[i-1][j]) 
+            # Second law
+            else: myMatrix[i][j] = myMatrix[i-1][j] 
+    
+    # Now I have the Matrix build. I have to select the ones that maximizes the exam strategy
+    #Let's get the last item of the matrix  
+    c, w, res = myMatrix[row][capacity], capacity, list()
+    for i in range(row, 0, -1): 
+        if myMatrix[row][capacity] <= 0: break 
+        elif myMatrix[row][capacity] == myMatrix[i - 1][w]: continue
+        else: 
+            res.append([i-1])
+            res.append(weight[i - 1]) 
+            myMatrix[row][capacity] -= value[i - 1] 
+            w -= weight[i - 1] 
+    final=[j for i in res[::2] for j in i]
+    final.reverse()
+    return [final, c]
 
 
 def pick_questions_to_answer(filename: str) -> Tuple[List[int], int]:
@@ -28,7 +54,14 @@ def pick_questions_to_answer(filename: str) -> Tuple[List[int], int]:
     This function takes file name as an argument.
     The function returns a tuple of two items: the list of chosen indices and total point value of all selected questions.
     """
-    raise NotImplementedError
+    myList = []
+    with open(filename) as f:
+        for aline in f:
+            aline = aline.split()
+            if aline:          
+                aline = [int(float(i)) for i in aline]
+                myList.append(aline)
+    return (knapsack(myList[0][0], myList))
 
 
 def main():
