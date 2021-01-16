@@ -34,9 +34,10 @@ def knapsack(capacity: int, items: List[Item]) -> List[int]:
     # Now I have the Matrix build. I have to select the ones that maximizes the exam strategy
     #Let's get the last item of the matrix  
     c, w, res = myMatrix[row][capacity], capacity, list()
+    cond = True
     for i in range(row, 0, -1): 
-        if myMatrix[row][capacity] <= 0: break 
-        elif myMatrix[row][capacity] == myMatrix[i - 1][w]: continue
+        if myMatrix[row][capacity] <= 0: cond is False
+        elif myMatrix[row][capacity] == myMatrix[i - 1][w] and cond is True: continue
         else: 
             res.append([i-1])
             res.append(weight[i - 1]) 
