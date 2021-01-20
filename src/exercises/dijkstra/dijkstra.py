@@ -8,15 +8,21 @@ import toml
 
 def read_toml(filename: str) -> Graph:
     """Read TOML config file"""
-    pass
+    n, g =  dict(), Graph()
+    myRoute = toml.load(filename)
+    for i in myRoute['routers']: n[i['address']] = i['name']
+    for i in myRoute['routers']:
+        for j in i['neighbors']: g.add_edge(i['name'], n[j['address']], j['cost'])
+    return g
 
 def find_path(g: Graph, start: str) -> None:
     """Use Dijkstra's algorithm to find the shortest path from *start* to other vertices"""
-    pass
+    print(g.dijkstra(g.get_vertex(start)))
 
 
 def main():
-    pass
+    graph = read_toml("data/exercises/dijkstra/network.toml")
+    find_path(graph, 'v')
 
 
 if __name__ == "__main__":
